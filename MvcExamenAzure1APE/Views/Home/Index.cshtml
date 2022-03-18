@@ -1,0 +1,160 @@
+﻿@{ ViewData["Title"] = "Home Page"; }
+
+@section Scripts{
+    <script>var urlApi = "https://apiexamenazure1ape.azurewebsites.net/";
+
+        $(document).ready(function () {
+            cargarSeriesObjetos();
+
+            $("#btnAnadir").click(function () {
+                var id = $("#IdSerie").val();
+                var nomserie = $("#Serie").val();
+                var imagen = $("#Imagen").val();
+                var puntuacion = $("#Puntuacion").val();
+                var año = $("#Año").val();
+                var serie = new Object();
+                serie.idSerie = parseInt(id);
+                serie.nombreSerie = nomserie;
+                serie.imagen = imagen;
+                serie.puntuacion = parseInt(puntuacion);
+                serie.año = parseInt(año);
+                var json = JSON.stringify(serie);
+                var request = "/api/series";
+                $.ajax({
+                    url: urlApi + request
+                    , type: "POST"
+                    , data: json
+                    , contentType: "application/json"
+                    , success: function () {
+                        cargarSeriesObjetos();
+                    }
+                });
+            });
+
+            $("#btnModificar").click(function () {
+                var id = $("#IdSerie").val();
+                var nomserie = $("#Serie").val();
+                var imagen = $("#Imagen").val();
+                var puntuacion = $("#Puntuacion").val();
+                var año = $("#Año").val();
+                var serie = new Object();
+                serie.idSerie = parseInt(id);
+                serie.nombreSerie = nomserie;
+                serie.imagen = imagen;
+                serie.puntuacion = parseInt(puntuacion);
+                serie.año = parseInt(año);
+                var json = JSON.stringify(serie);
+                var request = "/api/Series";
+                $.ajax({
+                    url: urlApi + request
+                    , type: "PUT"
+                    , data: json
+                    , contentType: "application/json"
+                    , success: function () {
+                        cargarSeriesObjetos();
+                    }
+                });
+            });
+
+            $("#btnEliminar").click(function () {
+                var id = $("#IdSerie").val();
+                var request = "/api/Series/" + parseInt(id);
+                $.ajax({
+                    url: urlApi + request
+                    , type: "DELETE"
+                    , success: function () {
+                        cargarSeriesObjetos();
+                    }
+                });
+            });
+        });
+
+        function cargarSeriesObjetos()
+        {
+            var request = "/api/Series";
+            $.ajax({
+                url: urlApi + request
+                , method: "GET"
+                , dataType: "json"
+                , success: function (data) {
+                    $("#tablaSeries tbody").html("");
+                    $.each(data, function (index, serie) {
+                        var tr = $("<tr>");
+                        var tdidSerie = $("<td>", {
+                            "text": serie.idSerie
+                        });
+                        var tdSerie = $("<td>", {
+                            "text": serie.nombreSerie
+                        });
+                        var tdImagen = $("<td>");
+                        var imgFoto = $("<img>", {
+                            "src": serie.imagen,
+                            "width": "300"
+                        });
+                        var tdPuntuacion = $("<td>", {
+                            "text": serie.puntuacion
+                        });
+                        var tdAño = $("<td>", {
+                            "text": serie.año
+                        });
+                        var tdBtnEliminar = $("<td>");
+                        var btnPersonajes = $("<button>", {
+                            "text": "Personajes",
+                            "class": "btn btn-danger",
+                            "data-id": serie.idSerie
+                        });
+                        tdImagen.append(imgFoto);
+                        tdBtnEliminar.append(btnPersonajes);
+                        tr.append(tdidSerie).append(tdSerie).append(tdImagen).append(tdPuntuacion).append(tdAño).append(btnPersonajes);
+                        $("#tablaSeries tbody").append(tr);
+
+                        btnEliminar.click(function () {
+                            var id = $(this).data("id");
+                            console.log(id);
+                            var request = "/api/peliculas/" + id;
+                            $.ajax({
+                                url: urlApi + request
+                                , type: "DELETE"
+                                , success: function () {
+                                    cargarSeriesObjetos();
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+        }</script>
+}
+
+
+<div class="text-center">
+    <div>
+        <label>Id Serie : </label>
+        <input id="IdSerie" type="text" class="form-control" />
+        <label>Serie</label>
+        <input type="text" id="Serie" class="form-control" />
+        <label>Imagen</label>
+        <input type="text" id="Imagen" class="form-control" />
+        <label>Puntuacion</label>
+        <input type="text" id="Puntuacion" class="form-control" />
+        <label>Año</label>
+        <input type="text" id="Año" class="form-control" />
+        <button id="btnAnadir" class="btn btn-success">Añadir</button>
+        <button id="btnModificar" class="btn btn-warning">Modificar</button>
+        <button id="btnEliminar" class="btn btn-danger">Eliminar</button>
+    </div>
+    <div>
+        <table class="table-bordered" id="tablaSeries">
+            <thead>
+                <tr>
+                    <th>Nombre Serie</th>
+                    <th>Imagen</th>
+                    <th>Puntuacion</th>
+                    <th>Año</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
